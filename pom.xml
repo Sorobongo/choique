@@ -59,10 +59,15 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <!-- Replace with the database you will be using in production -->
+	        <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+
+            <!-- Replace with the database you will be using in production 
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+            -->
         </dependency>
 
         <!-- Additional Spring Dependencies -->
@@ -102,6 +107,12 @@
             <version>${archunit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
     </dependencies>
 
     <build>
