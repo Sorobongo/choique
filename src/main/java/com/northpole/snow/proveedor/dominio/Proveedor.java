@@ -117,4 +117,9 @@ public class Proveedor extends BaseEntity   implements Serializable{
 	public ProveedorDomicilio getDomicilioComercial() {
 		return proveedorDomicilio.stream().filter(d->d.getTipoDomicilio().getId()==1).findFirst().get();
 	}
+
+		@Transient
+	   public boolean isNewProduct() {
+	        return getId() == -1;
+	    }
 }

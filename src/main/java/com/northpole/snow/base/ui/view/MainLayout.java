@@ -2,6 +2,7 @@ package com.northpole.snow.base.ui.view;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.html.Div;
@@ -25,13 +26,15 @@ import static com.vaadin.flow.theme.lumo.LumoUtility.*;
 public final class MainLayout extends AppLayout {
 
     MainLayout() {
-        setPrimarySection(Section.DRAWER);
-        addToDrawer(createHeader(), new Scroller(createSideNav()), createUserMenu());
+//        setPrimarySection(Section.DRAWER);
+        //addToDrawer(createHeader(), new Scroller(createSideNav()), createUserMenu());
+        addToDrawer(new Scroller(createSideNav()), createUserMenu());
+        addToNavbar(createHeader());
     }
 
     private Div createHeader() {
         // TODO Replace with real application logo and name
-        var appLogo = VaadinIcon.CUBES.create();
+    	var appLogo = VaadinIcon.CUBES.create();
         appLogo.addClassNames(TextColor.PRIMARY, IconSize.LARGE);
 
         var appName = new Span("Prancer Framework");

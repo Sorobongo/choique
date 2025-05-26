@@ -6,59 +6,81 @@ import java.time.Clock;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Optional;
+import java.util.ResourceBundle;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.northpole.snow.base.ui.component.ViewToolbar;
+import com.northpole.snow.base.ui.view.MainLayout;
+import com.northpole.snow.proveedor.componente.ProveedorViewLogic;
+import com.northpole.snow.proveedor.componente.ProveedorForm;
 import com.northpole.snow.proveedor.dominio.Proveedor;
 import com.northpole.snow.proveedor.service.impl.ProveedorService;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Main;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Menu;
+import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import jakarta.annotation.security.PermitAll;
 
-@Route("proveedor-lista")
+@Route(value = "proveedor-lista", layout = MainLayout.class)
 @PageTitle("Proveedores")
 @Menu(order = 1, icon = "vaadin:clipboard-check", title = "Proveedores")
 @PermitAll // When security is enabled, allow all authenticated users
 
-public class ProveedorListView extends Main {
-	
+public class ProveedorListView extends Main implements HasUrlParameter<String>{
+	   private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
+
+	@Autowired
+	private ProveedorService proveedorService;
+
 	private String MAX_WIDTH = "400px";
 	private String BUTTON_WIDTH = "123px";
-    private final ProveedorService proveedorService;
-//    private Button newBtn = new Button("New");
-//    private Button deleteBtn = new Button("Delete");
-//    private Button saveBtn = new Button("Save");
-//
-//    private HorizontalLayout btnLayout = new HorizontalLayout();
-//    private HorizontalLayout fieldsLayout = new HorizontalLayout();
-    
-    final TextField razonSocial;
-    final TextField cuit;
-    final TextField condicionIva;
+    private final ProveedorForm form;
+    private TextField filter;
+
+    private final ProveedorViewLogic viewLogic = new ProveedorViewLogic(this);
+    private Button newProveedor;
+//    final TextField razonSocial;
+//    final TextField cuit;
+//    final TextField condicionIva;
 
     final Grid<Proveedor> proveedorGrid;
 
-    public ProveedorListView(ProveedorService proveedorService, Clock clock) {
-    	
-    	
-        this.proveedorService = proveedorService;
-
-        razonSocial = new TextField();
-        cuit = new TextField();
-        condicionIva = new TextField();
+    public ProveedorListView(Clock clock) {
+        final HorizontalLayout topLayout = createTopBar();
         
+        form = new ProveedorForm(viewLogic);
+//		razonSocial = new TextField();
+//        cuit = new TextField();
+//        condicionIva = new TextField();
+
+        newProveedor = new Button(resourceBundle.getString("new_product"));
+        // Setting theme variant of new production button to LUMO_PRIMARY that
+        // changes its background color to blue and its text color to white
+        newProveedor.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        newProveedor.setIcon(VaadinIcon.PLUS_CIRCLE.create());
+        newProveedor.addClickListener(click -> viewLogic.newProduct());
+        // A shortcut to click the new product button by pressing ALT + N
+        newProveedor.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 //        newBtn.setWidth(BUTTON_WIDTH);
 //        deleteBtn.setWidth(BUTTON_WIDTH);
 //        saveBtn.setWidth(BUTTON_WIDTH);
@@ -72,11 +94,22 @@ public class ProveedorListView extends Main {
 //        add(fieldsLayout);
 
         proveedorGrid = new Grid<>();
+//        proveedorGrid.asSingleSelect().addValueChangeListener(
+//                event -> viewLogic.rowSelected(event.getValue()));
         proveedorGrid.addItemClickListener(item -> {
-        	verDetalle(item.getItem());
-            Notification.show(String.format("File location: %s", item.getItem().getRazonSocial() ));
-            Notification.show(String.format("File location: %s", item.getItem().getId()));
+            viewLogic.rowSelected(item.getItem());
+//            Notification.show(String.format("File location: %s", item.getItem().getRazonSocial() ));
+//            Notification.show(String.format("File location: %s", item.getItem().getId()));
         });
+        final VerticalLayout barAndGridLayout = new VerticalLayout();
+        barAndGridLayout.add(topLayout);
+        barAndGridLayout.add(proveedorGrid);
+        barAndGridLayout.setFlexGrow(1, proveedorGrid);
+        barAndGridLayout.setFlexGrow(0, topLayout);
+        barAndGridLayout.setSizeFull();
+        barAndGridLayout.expand(proveedorGrid);
+
+        add(barAndGridLayout);
         
 //        newBtn.addClickListener(click -> {
 //
@@ -112,7 +145,7 @@ public class ProveedorListView extends Main {
         proveedorGrid.addColumn(Proveedor::getId).setKey("id").setVisible(false);
         proveedorGrid.addColumn(Proveedor::getRazonSocial).setHeader("Razón social").setSortable(true).setSortProperty("razonSocial");
         proveedorGrid.addColumn(Proveedor::getCuit).setHeader("Cuit");
-        proveedorGrid.addColumn(proveedor -> proveedor.getCondicionIva().getCondicion());
+        proveedorGrid.addColumn(proveedor -> proveedor.getCondicionIva().getCondicion()).setHeader("Condición IVA");
         proveedorGrid.addColumn(proveedor -> Optional.ofNullable(proveedor.getFechaAlta()).map(dateFormatter::format).orElse("Never"))
                 .setHeader("Fecha Alta");
         //proveedorGrid.addColumn(task -> dateTimeFormatter.format(proveedor.getCreationDate())).setHeader("Creation Date");
@@ -124,12 +157,38 @@ public class ProveedorListView extends Main {
 
 //          add(new ViewToolbar("Task List", ViewToolbar.group(razonSocial, cuit, condicionIva)));
         add(proveedorGrid);
+        viewLogic.init();
     }
 
-    private void verDetalle(Proveedor proveedor) {
-    	UI.getCurrent().navigate(ProveedorEditor.class, proveedor);
+//    private void verDetalle(Proveedor proveedor) {
+//    	UI.getCurrent().navigate(ProveedorEditor.class, proveedor);
+//    }
+    public HorizontalLayout createTopBar() {
+        filter = new TextField();
+        filter.setPlaceholder(resourceBundle.getString("filter_placeholder"));
+        // Apply the filter to grid's data provider. TextField value is never
+//        filter.addValueChangeListener(
+//                event -> dataProvider.setFilter(event.getValue()));
+        // A shortcut to focus on the textField by pressing ctrl + F
+        filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
+
+        newProveedor = new Button(resourceBundle.getString("new_product"));
+        // Setting theme variant of new production button to LUMO_PRIMARY that
+        // changes its background color to blue and its text color to white
+        newProveedor.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        newProveedor.setIcon(VaadinIcon.PLUS_CIRCLE.create());
+        newProveedor.addClickListener(click -> viewLogic.newProduct());
+        // A shortcut to click the new product button by pressing ALT + N
+        newProveedor.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+        final HorizontalLayout topLayout = new HorizontalLayout();
+        topLayout.setWidth("100%");
+        topLayout.add(filter);
+        topLayout.add(newProveedor);
+        topLayout.setVerticalComponentAlignment(Alignment.START, filter);
+        topLayout.expand(filter);
+        return topLayout;
     }
-    
+
     private void createTask() {
 //        proveedorService.createTask(description.getValue(), dueDate.getValue());
 //        taskGrid.getDataProvider().refreshAll();
@@ -144,10 +203,62 @@ public class ProveedorListView extends Main {
         proveedorGrid.setItems(query -> proveedorService.list(toSpringPageRequest(query)).stream());
     }
 
-    private void clearInputFields() {
-
-        razonSocial.clear();
-        cuit.clear();
-        condicionIva.clear();
+//    private void clearInputFields() {
+//
+//        razonSocial.clear();
+//        cuit.clear();
+//        condicionIva.clear();
+//    }
+    
+    public void clearSelection() {
+        proveedorGrid.getSelectionModel().deselectAll();
     }
+
+    public void setNewProductEnabled(boolean enabled) {
+        newProveedor.setEnabled(enabled);
+    }
+
+    public void selectRow(Proveedor row) {
+        proveedorGrid.getSelectionModel().select(row);
+    }
+
+    public void removeProduct(Proveedor proveedor) {
+        proveedorService.delete(proveedor);
+    }
+
+    /**
+     * Displays user a form to edit a Product.
+     * 
+     * @param product
+     */
+    public void editProveedor(Proveedor product) {
+        showForm(product != null);
+        form.editProveedor(product);
+    }
+
+    /**
+     * Shows and hides the new product form
+     * 
+     * @param show
+     */
+    public void showForm(boolean show) {
+        form.setVisible(show);
+        form.setEnabled(show);
+    }
+
+    public void updateProduct(Proveedor proveedor) {
+        proveedorService.save(proveedor);
+    }
+
+
+    @Override
+    public void setParameter(BeforeEvent event,
+            @OptionalParameter String parameter) {
+        viewLogic.enter(parameter);
+    }
+
+    public void showNotification(String msg) {
+        Notification.show(msg);
+    }
+
 }

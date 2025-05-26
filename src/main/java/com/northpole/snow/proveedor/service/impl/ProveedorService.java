@@ -32,4 +32,8 @@ public class ProveedorService {
 	    public void delete(Proveedor proveedor) {
 	    	proveedorDao.delete(proveedor);
 	    }
+	    
+	    public Proveedor findById(Integer id) {
+	    	return proveedorDao.findById(id).get();
+	    }
 }
