@@ -1,8 +1,8 @@
 package com.northpole.snow;
 
+import com.northpole.snow.application.seguridad.ui.view.LoginView;
 import com.northpole.snow.autenticacion.AccessControl;
 import com.northpole.snow.autenticacion.AccessControlFactory;
-import com.northpole.snow.login.LoginScreen;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 
@@ -20,9 +20,9 @@ public class ChoiqueInitListener implements VaadinServiceInitListener {
 
         initEvent.getSource().addUIInitListener(uiInitEvent -> {
             uiInitEvent.getUI().addBeforeEnterListener(enterEvent -> {
-                if (!accessControl.isUserSignedIn() && !LoginScreen.class
+                if (!accessControl.isUserSignedIn() && !LoginView.class
                         .equals(enterEvent.getNavigationTarget()))
-                    enterEvent.rerouteTo(LoginScreen.class);
+                    enterEvent.rerouteTo(LoginView.class);
             });
         });
     }

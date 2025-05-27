@@ -1,4 +1,4 @@
-package com.northpole.snow.login;
+package com.northpole.snow.application.seguridad.ui.view;
 
 import com.northpole.snow.autenticacion.AccessControl;
 import com.northpole.snow.autenticacion.AccessControlFactory;
@@ -12,8 +12,11 @@ import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -21,16 +24,19 @@ import java.util.ResourceBundle;
 /**
  * UI content when the user is not logged in yet.
  */
-@Route//("Login")
+@Route(value = "login", autoLayout = false)
 @PageTitle("Login")
+@AnonymousAllowed
 @CssImport("./styles/shared-styles.css")
-public class LoginScreen extends FlexLayout {
+public class LoginView extends FlexLayout implements BeforeEnterObserver {
 
     private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
 
     private AccessControl accessControl;
 
-    public LoginScreen() {
+    private LoginForm loginForm;
+    
+    public LoginView() {
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();
     }
@@ -40,7 +46,7 @@ public class LoginScreen extends FlexLayout {
         setClassName("login-screen");
 
         // login form, centered in the available part of the screen
-        LoginForm loginForm = new LoginForm();
+        loginForm = new LoginForm();
         loginForm.setI18n(createLoginI18n());
         loginForm.addLoginListener(this::login);
         loginForm.addForgotPasswordListener(
@@ -79,7 +85,7 @@ public class LoginScreen extends FlexLayout {
 
     private void login(LoginForm.LoginEvent event) {
         if (accessControl.signIn(event.getUsername(), event.getPassword())) {
-            getUI().get().navigate("");
+            getUI().get().navigate("principal");
         } else {
             event.getSource().setError(true);
         }
@@ -97,5 +103,17 @@ public class LoginScreen extends FlexLayout {
         i18n.getErrorMessage().setTitle(resourceBundle.getString("login_error_title"));
         i18n.getErrorMessage().setMessage(resourceBundle.getString("login_error_msg"));
         return i18n;
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        if (event.getLocation()
+                 .getQueryParameters()
+                 .getParameters()
+                 .containsKey("error")) {
+            loginForm.setError(true); 
+
+
+        }
     }
 }

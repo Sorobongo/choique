@@ -17,6 +17,8 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
+import com.vaadin.flow.spring.security.AuthenticationContext;
+
 import jakarta.annotation.security.PermitAll;
 
 import static com.vaadin.flow.theme.lumo.LumoUtility.*;
@@ -25,9 +27,24 @@ import static com.vaadin.flow.theme.lumo.LumoUtility.*;
 @PermitAll // When security is enabled, allow all authenticated users
 public final class MainLayout extends AppLayout {
 
-    MainLayout() {
+    private final AuthenticationContext authenticationContext; 
+
+
+
+//    public MainLayout(AuthenticationContext authenticationContext) { 
+//
+//
+//        this.authenticationContext = authenticationContext;
+//        setPrimarySection(Section.DRAWER);
+//        addToDrawer(createHeader(), new Scroller(createSideNav()), createUserMenu());
+//    }
+//	
+
+	public MainLayout(AuthenticationContext authenticationContext) {
 //        setPrimarySection(Section.DRAWER);
         //addToDrawer(createHeader(), new Scroller(createSideNav()), createUserMenu());
+        this.authenticationContext = authenticationContext;
+        //setPrimarySection(Section.DRAWER);
         addToDrawer(new Scroller(createSideNav()), createUserMenu());
         addToNavbar(createHeader());
     }
@@ -75,7 +92,7 @@ public final class MainLayout extends AppLayout {
         userMenuItem.add("John Smith");
         userMenuItem.getSubMenu().addItem("View Profile").setEnabled(false);
         userMenuItem.getSubMenu().addItem("Manage Settings").setEnabled(false);
-        userMenuItem.getSubMenu().addItem("Logout").setEnabled(false);
+        userMenuItem.getSubMenu().addItem("Logout", event -> authenticationContext.logout()).setEnabled(true);
 
         return userMenu;
     }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.northpole.snow.autenticacion.AccessControl;
 import com.northpole.snow.autenticacion.AccessControlFactory;
@@ -22,12 +23,14 @@ import com.vaadin.flow.component.UI;
  * the system separately, and to e.g. provide alternative views for the same
  * data.
  */
+
 public class ProveedorViewLogic implements Serializable {
 
-    private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
-    private final ProveedorListView view;
     @Autowired
     private ProveedorService service;
+    private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
+    private final ProveedorListView view;
+
     public ProveedorViewLogic(ProveedorListView simpleCrudView) {
         view = simpleCrudView;
     }
@@ -84,7 +87,7 @@ public class ProveedorViewLogic implements Serializable {
                 // login
                 try {
                     final int pid = Integer.parseInt(productId);
-                    final Proveedor product = findProduct(pid);
+                     final Proveedor product = view.findProduct(pid);
                     view.selectRow(product);
                 } catch (final NumberFormatException e) {
                 }
@@ -94,9 +97,9 @@ public class ProveedorViewLogic implements Serializable {
         }
     }
 
-    private Proveedor findProduct(int proveedorId) {
-    	return service.findById(proveedorId);
-    }
+//    private Proveedor findProduct(int proveedorId) {
+//    	return service.findById(proveedorId);
+//    }
 
     public void saveProduct(Proveedor proveedor) {
         final boolean newProduct = proveedor.isNewProduct();

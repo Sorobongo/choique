@@ -41,11 +41,10 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import jakarta.annotation.security.PermitAll;
 
-@Route(value = "proveedor-lista", layout = MainLayout.class)
+@Route(value = "proveedor-lista")//, layout = MainLayout.class)
 @PageTitle("Proveedores")
 @Menu(order = 1, icon = "vaadin:clipboard-check", title = "Proveedores")
 @PermitAll // When security is enabled, allow all authenticated users
-
 public class ProveedorListView extends Main implements HasUrlParameter<String>{
 	   private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
 
@@ -66,41 +65,25 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
     final Grid<Proveedor> proveedorGrid;
 
     public ProveedorListView(Clock clock) {
+    	
+    	setSizeFull();
+    	
         final HorizontalLayout topLayout = createTopBar();
         
-        form = new ProveedorForm(viewLogic);
-//		razonSocial = new TextField();
-//        cuit = new TextField();
-//        condicionIva = new TextField();
-
-        newProveedor = new Button(resourceBundle.getString("new_product"));
-        // Setting theme variant of new production button to LUMO_PRIMARY that
-        // changes its background color to blue and its text color to white
-        newProveedor.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        newProveedor.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        newProveedor.addClickListener(click -> viewLogic.newProduct());
-        // A shortcut to click the new product button by pressing ALT + N
-        newProveedor.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
-//        newBtn.setWidth(BUTTON_WIDTH);
-//        deleteBtn.setWidth(BUTTON_WIDTH);
-//        saveBtn.setWidth(BUTTON_WIDTH);
-
-//        btnLayout.add(newBtn, deleteBtn, saveBtn);
-//        btnLayout.setMaxWidth(MAX_WIDTH);
-//
-//        fieldsLayout.add(razonSocial, cuit, condicionIva);
-//
-//        add(btnLayout);
-//        add(fieldsLayout);
-
+        var dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocale());
         proveedorGrid = new Grid<>();
-//        proveedorGrid.asSingleSelect().addValueChangeListener(
-//                event -> viewLogic.rowSelected(event.getValue()));
-        proveedorGrid.addItemClickListener(item -> {
-            viewLogic.rowSelected(item.getItem());
-//            Notification.show(String.format("File location: %s", item.getItem().getRazonSocial() ));
-//            Notification.show(String.format("File location: %s", item.getItem().getId()));
-        });
+        proveedorGrid.asSingleSelect().addValueChangeListener(
+              event -> viewLogic.rowSelected(event.getValue()));
+
+        proveedorGrid.setItems(query -> proveedorService.list(toSpringPageRequest(query)).stream());
+        proveedorGrid.addColumn(Proveedor::getId).setKey("id").setVisible(false);
+        proveedorGrid.addColumn(Proveedor::getRazonSocial).setHeader("Razón social").setSortable(true).setSortProperty("razonSocial");
+        proveedorGrid.addColumn(Proveedor::getCuit).setHeader("Cuit");
+        proveedorGrid.addColumn(proveedor -> proveedor.getCondicionIva().getCondicion()).setHeader("Condición IVA");
+        proveedorGrid.addColumn(proveedor -> Optional.ofNullable(proveedor.getFechaAlta()).map(dateFormatter::format).orElse("Never"))
+                .setHeader("Fecha Alta");
+        form = new ProveedorForm(viewLogic);
+
         final VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(topLayout);
         barAndGridLayout.add(proveedorGrid);
@@ -110,59 +93,10 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
         barAndGridLayout.expand(proveedorGrid);
 
         add(barAndGridLayout);
-        
-//        newBtn.addClickListener(click -> {
-//
-//            clearInputFields();
-//            proveedorGrid.select(null);
-//        });
-//
-//        deleteBtn.addClickListener(click -> {
-// 
-//            proveedorService.delete(proveedorGrid.getSelectedItems().stream().toList().get(0));
-//            
-//            clearInputFields();
-//            refreshTableData();
-//        });
-//
-//        saveBtn.addClickListener(click -> {
-//
-//            Proveedor proveedor = new Proveedor();
-//            proveedor.setRazonSocial(razonSocial.getValue());
-//            proveedor.setCuit(cuit.getValue());
-////            proveedor.setCondicionIva(condicionIva.getValue());
-//
-//            proveedorService.save(proveedor);
-//
-//            clearInputFields();
-//            refreshTableData();
-//        });
-        var dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(clock.getZone())
-                .withLocale(getLocale());
-        var dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocale());
-
-        proveedorGrid.setItems(query -> proveedorService.list(toSpringPageRequest(query)).stream());
-        proveedorGrid.addColumn(Proveedor::getId).setKey("id").setVisible(false);
-        proveedorGrid.addColumn(Proveedor::getRazonSocial).setHeader("Razón social").setSortable(true).setSortProperty("razonSocial");
-        proveedorGrid.addColumn(Proveedor::getCuit).setHeader("Cuit");
-        proveedorGrid.addColumn(proveedor -> proveedor.getCondicionIva().getCondicion()).setHeader("Condición IVA");
-        proveedorGrid.addColumn(proveedor -> Optional.ofNullable(proveedor.getFechaAlta()).map(dateFormatter::format).orElse("Never"))
-                .setHeader("Fecha Alta");
-        //proveedorGrid.addColumn(task -> dateTimeFormatter.format(proveedor.getCreationDate())).setHeader("Creation Date");
-        proveedorGrid.setSizeFull();
-
-        setSizeFull();
-        addClassNames(LumoUtility.BoxSizing.BORDER, LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN,
-                LumoUtility.Padding.MEDIUM, LumoUtility.Gap.SMALL);
-
-//          add(new ViewToolbar("Task List", ViewToolbar.group(razonSocial, cuit, condicionIva)));
-        add(proveedorGrid);
+        add(form);
         viewLogic.init();
     }
 
-//    private void verDetalle(Proveedor proveedor) {
-//    	UI.getCurrent().navigate(ProveedorEditor.class, proveedor);
-//    }
     public HorizontalLayout createTopBar() {
         filter = new TextField();
         filter.setPlaceholder(resourceBundle.getString("filter_placeholder"));
@@ -196,6 +130,10 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
 //        dueDate.clear();
 //        Notification.show("Task added", 3000, Notification.Position.BOTTOM_END)
 //                .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    }
+
+    public Proveedor findProduct(int proveedorId) {
+    	return proveedorService.findById(proveedorId);
     }
 
     private void refreshTableData() {

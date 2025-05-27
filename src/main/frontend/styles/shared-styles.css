@@ -66,7 +66,7 @@ body {
     color: var(--lumo-secondary-text-color);
 }
 
-.product-form {
+.proveedor-form {
     position: absolute;
     right: 0;
     bottom: 0;
@@ -76,12 +76,12 @@ body {
     box-shadow: var(--overlay-box-shadow);
 }
 
-html[dir="rtl"] .product-form {
+html[dir="rtl"] .proveedor-form {
     right: auto;
     left: 0;
 }
 
-.product-form-content {
+.proveedor-form-content {
     margin-top: var(--_vaadin-app-layout-navbar-offset-size);
 }
 
@@ -107,7 +107,7 @@ html[dir="rtl"] .product-form {
 
 @media (max-width: 550px) {
 
-    .product-form {
+    .proveedor-form {
         width: 100%;
 
         /* Prevent text-fields from overflowing on narrow screens */

@@ -1,5 +1,7 @@
 package com.northpole.snow;
 
+import java.time.Clock;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -32,6 +34,11 @@ public class StartupConfig implements ApplicationListener<ApplicationReadyEvent>
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
         return mapper;
+    }
+
+    @Bean
+    Clock clock() {
+        return Clock.systemDefaultZone(); // You can also use Clock.systemUTC()
     }
 
     @Bean
