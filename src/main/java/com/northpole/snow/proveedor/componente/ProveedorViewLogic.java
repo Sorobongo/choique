@@ -12,6 +12,7 @@ import com.northpole.snow.proveedor.dominio.Proveedor;
 import com.northpole.snow.proveedor.service.impl.ProveedorService;
 import com.northpole.snow.proveedor.ui.view.ProveedorListView;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.notification.Notification;
 
 
 /**
@@ -88,12 +89,12 @@ public class ProveedorViewLogic implements Serializable {
                 try {
                     final int pid = Integer.parseInt(productId);
                      final Proveedor product = view.findProduct(pid);
-                    view.selectRow(product);
+//                    view.selectRow(product);
                 } catch (final NumberFormatException e) {
                 }
             }
         } else {
-            view.showForm(false);
+          //  view.showForm(false);
         }
     }
 
@@ -123,13 +124,13 @@ public class ProveedorViewLogic implements Serializable {
         } else {
             setFragmentParameter(proveedor.getId() + "");
         }
-        view.editProveedor(proveedor);
+  //      view.editProveedor(proveedor);
     }
 
     public void newProduct() {
         view.clearSelection();
         setFragmentParameter("new");
-        view.editProveedor(new Proveedor());
+//        view.editProveedor(new Proveedor());
     }
 
     public void rowSelected(Proveedor proveedor) {
@@ -137,5 +138,9 @@ public class ProveedorViewLogic implements Serializable {
                 .isUserInRole(AccessControl.ADMIN_ROLE_NAME)) {
             editProduct(proveedor);
         }
+    }
+    
+    public void showMessage(String msj) {
+    	Notification.show(msj);
     }
 }

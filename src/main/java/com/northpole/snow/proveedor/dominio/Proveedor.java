@@ -86,7 +86,7 @@ public class Proveedor extends BaseEntity   implements Serializable{
 	@Builder.Default	
 	private List<ProveedorTipoInsumo> proveedorTipoInsumo = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "proveedor")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "proveedor")
 	@Builder.Default
 	private List<ProveedorDomicilio> proveedorDomicilio = new ArrayList<>();
 
@@ -113,10 +113,10 @@ public class Proveedor extends BaseEntity   implements Serializable{
 	@Builder.Default
 	private List<Insumo> insumos = new ArrayList<>();
 
-	@Transient
-	public ProveedorDomicilio getDomicilioComercial() {
-		return proveedorDomicilio.stream().filter(d->d.getTipoDomicilio().getId()==1).findFirst().get();
-	}
+//	@Transient
+//	public ProveedorDomicilio getDomicilioComercial() {
+//		return proveedorDomicilio.stream().filter(d->d.getTipoDomicilio().getId()==1).findFirst().get();
+//	}
 
 		@Transient
 	   public boolean isNewProduct() {

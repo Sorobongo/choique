@@ -2,6 +2,7 @@ package com.northpole.snow.application.seguridad.ui.view;
 
 import com.northpole.snow.autenticacion.AccessControl;
 import com.northpole.snow.autenticacion.AccessControlFactory;
+import com.northpole.snow.base.ui.view.MainView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -85,7 +86,7 @@ public class LoginView extends FlexLayout implements BeforeEnterObserver {
 
     private void login(LoginForm.LoginEvent event) {
         if (accessControl.signIn(event.getUsername(), event.getPassword())) {
-            getUI().get().navigate("principal");
+            getUI().get().navigate(MainView.class);
         } else {
             event.getSource().setError(true);
         }

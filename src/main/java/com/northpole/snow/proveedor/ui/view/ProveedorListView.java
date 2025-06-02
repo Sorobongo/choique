@@ -37,11 +37,15 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParam;
+import com.vaadin.flow.router.RouteParameterData;
+import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
+import io.swagger.v3.oas.models.parameters.QueryParameter;
 import jakarta.annotation.security.PermitAll;
 
-@Route(value = "proveedor-lista")//, layout = MainLayout.class)
+@Route(value = "/proveedor-lista", layout = MainLayout.class)
 @PageTitle("Proveedores")
 @Menu(order = 1, icon = "vaadin:clipboard-check", title = "Proveedores")
 @PermitAll // When security is enabled, allow all authenticated users
@@ -53,7 +57,7 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
 
 	private String MAX_WIDTH = "400px";
 	private String BUTTON_WIDTH = "123px";
-    private final ProveedorForm form;
+//    private final ProveedorForm form;
     private TextField filter;
 
     private final ProveedorViewLogic viewLogic = new ProveedorViewLogic(this);
@@ -72,17 +76,20 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
         
         var dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocale());
         proveedorGrid = new Grid<>();
-        proveedorGrid.asSingleSelect().addValueChangeListener(
-              event -> viewLogic.rowSelected(event.getValue()));
-
+//        proveedorGrid.asSingleSelect().addValueChangeListener(
+//              event -> viewLogic.rowSelected(event.getValue()));
+        proveedorGrid.addItemDoubleClickListener(event -> {
+        	UI.getCurrent().navigate(ProveedorForm.class, event.getItem().getId());	
+        });
         proveedorGrid.setItems(query -> proveedorService.list(toSpringPageRequest(query)).stream());
         proveedorGrid.addColumn(Proveedor::getId).setKey("id").setVisible(false);
         proveedorGrid.addColumn(Proveedor::getRazonSocial).setHeader("Razón social").setSortable(true).setSortProperty("razonSocial");
         proveedorGrid.addColumn(Proveedor::getCuit).setHeader("Cuit");
         proveedorGrid.addColumn(proveedor -> proveedor.getCondicionIva().getCondicion()).setHeader("Condición IVA");
+        proveedorGrid.addColumn(proveedor -> proveedor.getUrl()).setHeader("Web");
         proveedorGrid.addColumn(proveedor -> Optional.ofNullable(proveedor.getFechaAlta()).map(dateFormatter::format).orElse("Never"))
                 .setHeader("Fecha Alta");
-        form = new ProveedorForm(viewLogic);
+//        form = new ProveedorForm(viewLogic);
 
         final VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(topLayout);
@@ -93,7 +100,7 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
         barAndGridLayout.expand(proveedorGrid);
 
         add(barAndGridLayout);
-        add(form);
+//        add(form);
         viewLogic.init();
     }
 
@@ -156,9 +163,9 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
         newProveedor.setEnabled(enabled);
     }
 
-    public void selectRow(Proveedor row) {
-        proveedorGrid.getSelectionModel().select(row);
-    }
+//    public void selectRow(Proveedor row) {
+//        proveedorGrid.getSelectionModel().select(row);
+//    }
 
     public void removeProduct(Proveedor proveedor) {
         proveedorService.delete(proveedor);
@@ -169,20 +176,20 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
      * 
      * @param product
      */
-    public void editProveedor(Proveedor product) {
-        showForm(product != null);
-        form.editProveedor(product);
-    }
+//    public void editProveedor(Proveedor product) {
+//        showForm(product != null);
+//  //      form.editProveedor(product);
+//    }
 
     /**
      * Shows and hides the new product form
      * 
      * @param show
      */
-    public void showForm(boolean show) {
-        form.setVisible(show);
-        form.setEnabled(show);
-    }
+//    public void showForm(boolean show) {
+////        form.setVisible(show);
+////        form.setEnabled(show);
+//    }
 
     public void updateProduct(Proveedor proveedor) {
         proveedorService.save(proveedor);
