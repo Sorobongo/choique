@@ -30,9 +30,9 @@ public class ProveedorViewLogic implements Serializable {
     @Autowired
     private ProveedorService service;
     private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
-    private final ProveedorListView view;
-
-    public ProveedorViewLogic(ProveedorListView simpleCrudView) {
+    //private final ProveedorListView view;
+    private final ProveedorForm view;
+    public ProveedorViewLogic(ProveedorForm simpleCrudView){//ProveedorListView simpleCrudView) {
         view = simpleCrudView;
     }
 
@@ -40,16 +40,16 @@ public class ProveedorViewLogic implements Serializable {
      * Does the initialization of the inventory view including disabling the
      * buttons if the user doesn't have access.
      */
-    public void init() {
-        if (!AccessControlFactory.getInstance().createAccessControl()
-                .isUserInRole(AccessControl.ADMIN_ROLE_NAME)) {
-            view.setNewProductEnabled(false);
-        }
-    }
+//    public void init() {
+//        if (!AccessControlFactory.getInstance().createAccessControl()
+//                .isUserInRole(AccessControl.ADMIN_ROLE_NAME)) {
+//            view.setNewProductEnabled(false);
+//        }
+//    }
 
     public void cancelProduct() {
         setFragmentParameter("");
-        view.clearSelection();
+//        view.clearSelection();
     }
 
     /**
@@ -88,7 +88,7 @@ public class ProveedorViewLogic implements Serializable {
                 // login
                 try {
                     final int pid = Integer.parseInt(productId);
-                     final Proveedor product = view.findProduct(pid);
+                     final Proveedor proveedor = view.findProveedor(pid);
 //                    view.selectRow(product);
                 } catch (final NumberFormatException e) {
                 }
@@ -104,7 +104,6 @@ public class ProveedorViewLogic implements Serializable {
 
     public void saveProduct(Proveedor proveedor) {
         final boolean newProduct = proveedor.isNewProduct();
-        view.clearSelection();
         view.updateProduct(proveedor);
         setFragmentParameter("");
         view.showNotification(proveedor.getRazonSocial()
@@ -112,7 +111,6 @@ public class ProveedorViewLogic implements Serializable {
     }
 
     public void deleteProduct(Proveedor proveedor) {
-        view.clearSelection();
         view.removeProduct(proveedor);
         setFragmentParameter("");
         view.showNotification(proveedor.getRazonSocial() + " " + resourceBundle.getString("removed"));
@@ -128,7 +126,6 @@ public class ProveedorViewLogic implements Serializable {
     }
 
     public void newProduct() {
-        view.clearSelection();
         setFragmentParameter("new");
 //        view.editProveedor(new Proveedor());
     }

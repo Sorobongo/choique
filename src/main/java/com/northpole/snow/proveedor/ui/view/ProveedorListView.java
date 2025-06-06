@@ -60,7 +60,7 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
 //    private final ProveedorForm form;
     private TextField filter;
 
-    private final ProveedorViewLogic viewLogic = new ProveedorViewLogic(this);
+//    private final ProveedorViewLogic viewLogic = new ProveedorViewLogic(this);
     private Button newProveedor;
 //    final TextField razonSocial;
 //    final TextField cuit;
@@ -101,7 +101,7 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
 
         add(barAndGridLayout);
 //        add(form);
-        viewLogic.init();
+//        viewLogic.init();
     }
 
     public HorizontalLayout createTopBar() {
@@ -118,7 +118,7 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
         // changes its background color to blue and its text color to white
         newProveedor.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         newProveedor.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        newProveedor.addClickListener(click -> viewLogic.newProduct());
+//        newProveedor.addClickListener(click -> viewLogic.newProduct());
         // A shortcut to click the new product button by pressing ALT + N
         newProveedor.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
         final HorizontalLayout topLayout = new HorizontalLayout();
@@ -199,7 +199,7 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
     @Override
     public void setParameter(BeforeEvent event,
             @OptionalParameter String parameter) {
-        viewLogic.enter(parameter);
+//        viewLogic.enter(parameter);
     }
 
     public void showNotification(String msg) {

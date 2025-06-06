@@ -1,8 +1,6 @@
 package com.northpole.snow.proveedor.dominio;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,8 +10,6 @@ import java.util.Set;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -68,7 +64,7 @@ public class Proveedor extends BaseEntity   implements Serializable{
 	@DateTimeFormat(pattern ="dd/MM/yyyy hh:mm:ss")
 	private LocalDateTime fechaModificacion;
 
-	@OneToOne(fetch=FetchType.LAZY)
+	@OneToOne
 	@JoinColumn(name="tipo_proveedor_id", referencedColumnName="id")
 	private TipoProveedor tipoProveedor;
 
