@@ -45,9 +45,9 @@ import jakarta.annotation.security.PermitAll;
 
 @PermitAll
 public class EntityForm<T> extends Div {
-	
-    private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
 
+    private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
+    
     private final VerticalLayout content;
     
     protected Button newButton;
@@ -113,7 +113,7 @@ public class EntityForm<T> extends Div {
         init();
     }
 
-    private void init() {
+    public void init() {
         if (!AccessControlFactory.getInstance().createAccessControl()
                 .isUserInRole(AccessControl.ADMIN_ROLE_NAME)) {
             newButton.setEnabled(false);;

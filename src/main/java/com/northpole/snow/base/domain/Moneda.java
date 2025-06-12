@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.northpole.snow.base.enumerados.TipoCotizacionEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -37,11 +38,11 @@ public class Moneda extends NombreDescripcionEntity  implements Serializable{
 	}
 
 	@Transient
-	public BigDecimal getCotizacionActual(TipoCotizacion tipoCotizacion) {
+	public BigDecimal getCotizacionActual(TipoCotizacionEnum tipoCotizacion) {
 		BigDecimal cotizacion = BigDecimal.ONE;
 		MonedaCotizacion monedaCotizacion = cotizaciones.stream().filter(mc->mc.getMoneda().getId()==this.getId()).filter(mc->mc.getCondicion()==Condicion.ACTIVO).findFirst().get();
 
-		TipoCotizacion seleccionada = TipoCotizacion.values()[tipoCotizacion.get()];
+		TipoCotizacionEnum seleccionada = TipoCotizacionEnum.values()[tipoCotizacion.get()];
 
 		switch (seleccionada){
 

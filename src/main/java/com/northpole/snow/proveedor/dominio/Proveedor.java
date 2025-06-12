@@ -27,8 +27,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.northpole.snow.base.domain.BaseEntity;
 import com.northpole.snow.base.domain.CondicionIva;
 import com.northpole.snow.base.domain.CuentaCorrienteProveedor;
-import com.northpole.snow.base.domain.TipoCotizacion;
 import com.northpole.snow.base.domain.TipoProveedor;
+import com.northpole.snow.base.enumerados.EstadoEntidadEnum;
+import com.northpole.snow.base.enumerados.TipoCotizacionEnum;
 import com.northpole.snow.compra.dominio.FacturaCompra;
 import com.northpole.snow.compra.dominio.FacturaCompraPendienteEntrega;
 import com.northpole.snow.ordenproduccion.dominio.OrdenProduccion;
@@ -72,7 +73,7 @@ public class Proveedor extends BaseEntity   implements Serializable{
 	private Boolean agenteRetencion;
 
 	@Column(name = "tipo_cotizacion_id")
-	private TipoCotizacion tipoCotizacion;
+	private TipoCotizacionEnum tipoCotizacion;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="proveedor")
 	@Builder.Default
@@ -109,13 +110,13 @@ public class Proveedor extends BaseEntity   implements Serializable{
 	@Builder.Default
 	private List<Insumo> insumos = new ArrayList<>();
 
-//	@Transient
-//	public ProveedorDomicilio getDomicilioComercial() {
-//		return proveedorDomicilio.stream().filter(d->d.getTipoDomicilio().getId()==1).findFirst().get();
-//	}
+	@Transient
+	public Boolean isActivo() {
+		return activo;
+	}
 
-		@Transient
-	   public boolean isNewProduct() {
-	        return getId() == -1;
-	    }
+	@Transient
+	public Boolean isAgenteRetencion() {
+		return agenteRetencion;
+	}
 }

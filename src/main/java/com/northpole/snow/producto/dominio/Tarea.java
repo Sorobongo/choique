@@ -7,7 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.northpole.snow.base.domain.Moneda;
 import com.northpole.snow.base.domain.NombreDescripcionEntity;
-import com.northpole.snow.base.domain.TipoCotizacion;
+import com.northpole.snow.base.enumerados.TipoCotizacionEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,7 +35,7 @@ public class Tarea extends NombreDescripcionEntity implements Serializable{
 	private Moneda moneda;
 
 	@Column(name = "tipo_cotizacion_id")
-	private TipoCotizacion tipoCotizacion;
+	private TipoCotizacionEnum tipoCotizacion;
 
 	@OneToOne
 	@JoinColumn(name="unidad_id", referencedColumnName="id")

@@ -79,7 +79,7 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
 //        proveedorGrid.asSingleSelect().addValueChangeListener(
 //              event -> viewLogic.rowSelected(event.getValue()));
         proveedorGrid.addItemDoubleClickListener(event -> {
-        	UI.getCurrent().navigate(ProveedorForm.class, event.getItem().getId());	
+        	navegar(event.getItem().getId());	
         });
         proveedorGrid.setItems(query -> proveedorService.list(toSpringPageRequest(query)).stream());
         proveedorGrid.addColumn(Proveedor::getId).setKey("id").setVisible(false);
@@ -113,12 +113,13 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
         // A shortcut to focus on the textField by pressing ctrl + F
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 
-        newProveedor = new Button(resourceBundle.getString("new_product"));
+        newProveedor = new Button("Nuevo");//(resourceBundle.getString("Nuevonew_product"));
         // Setting theme variant of new production button to LUMO_PRIMARY that
         // changes its background color to blue and its text color to white
         newProveedor.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         newProveedor.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-//        newProveedor.addClickListener(click -> viewLogic.newProduct());
+        newProveedor.addClickListener(click -> 
+        	navegar(0));
         // A shortcut to click the new product button by pressing ALT + N
         newProveedor.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
         final HorizontalLayout topLayout = new HorizontalLayout();
@@ -200,6 +201,10 @@ public class ProveedorListView extends Main implements HasUrlParameter<String>{
     public void setParameter(BeforeEvent event,
             @OptionalParameter String parameter) {
 //        viewLogic.enter(parameter);
+    }
+
+    public void navegar(Integer param) {
+    	UI.getCurrent().navigate(ProveedorForm.class, param);
     }
 
     public void showNotification(String msg) {

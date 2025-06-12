@@ -26,6 +26,7 @@ public class ProveedorService {
 
 	    public void save(Proveedor proveedor) {
 	    	proveedor.setFechaAlta(LocalDateTime.now());
+	    	proveedor.setFechaModificacion(LocalDateTime.now());
 	    	proveedorDao.save(proveedor);
 	    }
 	    

@@ -1,6 +1,6 @@
-package com.northpole.snow.base.domain;
+package com.northpole.snow.base.enumerados;
 
-public enum TipoCotizacion {
+public enum TipoCotizacionEnum {
 
 	PESOS(0),
 	DOLAR_OFICIAL(1),
@@ -9,7 +9,7 @@ public enum TipoCotizacion {
 
 	private  int tipoCotizacion;
 
-	private TipoCotizacion(int tipoCotizacion) {
+	private TipoCotizacionEnum(int tipoCotizacion) {
 		this.tipoCotizacion = tipoCotizacion;
 	}
 

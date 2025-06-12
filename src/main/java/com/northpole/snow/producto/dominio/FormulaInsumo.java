@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.northpole.snow.base.domain.BaseEntity;
-import com.northpole.snow.base.domain.TipoCotizacion;
+import com.northpole.snow.base.enumerados.TipoCotizacionEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -62,7 +62,7 @@ public class FormulaInsumo extends BaseEntity  implements Serializable{
 	public BigDecimal getCosto() {
 
 		BigDecimal costo = BigDecimal.ZERO;
-		TipoCotizacion tipoCotizacion = insumo.getTipoCotizacion();
+		TipoCotizacionEnum tipoCotizacion = insumo.getTipoCotizacion();
 		costo = insumo.getPrecio().multiply(cantidad).multiply(insumo.getMoneda().getCotizacionActual(tipoCotizacion));
 		return costo;
 

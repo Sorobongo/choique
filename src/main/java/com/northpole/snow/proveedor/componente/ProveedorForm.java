@@ -1,10 +1,17 @@
 package com.northpole.snow.proveedor.componente;
 
+import java.util.ResourceBundle;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.northpole.snow.base.domain.CondicionIva;
 import com.northpole.snow.base.domain.TipoProveedor;
+import com.northpole.snow.base.enumerados.EstadoEntidadEnum;
+import com.northpole.snow.base.enumerados.SiNoEnum;
+import com.northpole.snow.base.enumerados.TipoCotizacionEnum;
 import com.northpole.snow.base.ui.component.EntityForm;
+import com.northpole.snow.base.ui.component.EstadoRadioButtonGroup;
+import com.northpole.snow.base.ui.component.SiNoRadioButtonGroup;
 import com.northpole.snow.base.ui.view.MainLayout;
 import com.northpole.snow.proveedor.dominio.Proveedor;
 import com.northpole.snow.proveedor.dominio.ProveedorDomicilio;
@@ -15,6 +22,9 @@ import com.northpole.snow.proveedor.service.impl.ProveedorService;
 import com.northpole.snow.proveedor.service.impl.TipoProveedorService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -24,6 +34,7 @@ import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
@@ -36,7 +47,7 @@ import jakarta.annotation.security.PermitAll;
 @PermitAll
 public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParameter<Integer>{
 	
-//    private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
+    private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
 
     @Autowired
     private ProveedorService service;
@@ -51,13 +62,15 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
     private TextField razonSocial;
     private TextField nombreFantasia;
     private TextField cuit;
-    private Select<CondicionIva> condicionIva = new Select<>();
-    private Select<TipoProveedor> tipoProveedor = new Select<>();
+    private TextField url;
+    private ComboBox<TipoCotizacionEnum> tipoCotizacion = new ComboBox<>();
+    private ComboBox<CondicionIva> condicionIva = new ComboBox<>();
+    private ComboBox<TipoProveedor> tipoProveedor = new ComboBox<>();
     
-    private final RadioButtonGroup<Boolean> estado;
-
+//    private EstadoRadioButtonGroup estado = new EstadoRadioButtonGroup();
+    private EstadoRadioButtonGroup estado;// = new RadioButtonGroup<>();
+    private SiNoRadioButtonGroup agenteRetencion;
     private final ProveedorViewLogic viewLogic  = new ProveedorViewLogic(this);
-//    private final Binder<Proveedor> binder;
     private Grid<ProveedorDomicilio> domicilios = new Grid<>(ProveedorDomicilio.class);
     
     public ProveedorForm(CondicionIvaService cis, TipoProveedorService tp) {
@@ -65,54 +78,64 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 
         condicionIvaSvc = cis;
         tipoProveedorSvc = tp;
-        
         content = new VerticalLayout();
-        content.setWidth("20px");
+        content.setWidth("100%");
         content.setSizeUndefined();
         content.addClassName("proveedor-form-content");
         add(content);
         
         razonSocial = new TextField("Razon social");//resourceBundle.getString("product_name"));
-        razonSocial.setWidth("100%");
+        razonSocial.setWidth(100, Unit.PERCENTAGE);
         razonSocial.setRequired(true);
         razonSocial.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(razonSocial);
+//        content.add(razonSocial);
         
         nombreFantasia = new TextField("Nombre comercial");//resourceBundle.getString("product_name"));
         nombreFantasia.setWidth("100%");
         nombreFantasia.setRequired(true);
         nombreFantasia.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(nombreFantasia);
-
+//        content.add(nombreFantasia);
         cuit = new TextField("Cuit");//resourceBundle.getString("cuit"));
         cuit.setWidth("100%");
         cuit.setRequired(true);
         cuit.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(cuit);
 
-        condicionIva = new Select<>();
         condicionIva.setLabel("Condicion IVA");
         condicionIva.setItemLabelGenerator(CondicionIva::getCondicion);
         condicionIva.setItems(condicionIvaSvc.findAll());
+
+        url = new TextField(resourceBundle.getString("url"));
+        url.setWidth(100, Unit.PERCENTAGE);
+        url.setValueChangeMode(ValueChangeMode.EAGER);
+        
+        HorizontalLayout nombre = new HorizontalLayout(razonSocial, nombreFantasia, cuit, condicionIva, url);
+        content.add(nombre);
+
 //        condicionIva.setItemEnabledProvider(
 //                item -> item.isSelected()
 //                		);
-        content.add(condicionIva);
+ //        content.add(condicionIva);
 
-        tipoProveedor = new Select<>();
         tipoProveedor.setLabel("Tipo proveedor");
         tipoProveedor.setItemLabelGenerator(TipoProveedor::getNombre);
         tipoProveedor.setItems(tipoProveedorSvc.findAll());
 //        condicionIva.setItemEnabledProvider(
 //                item -> item.isSelected()
 //                		);
-        content.add(tipoProveedor);
+        final HorizontalLayout radioButtonsLayout = new HorizontalLayout();
+ 
+        estado = new EstadoRadioButtonGroup();
+        estado.addValueChangeListener();
 
-        estado = new RadioButtonGroup<>();
-        estado.setLabel("Estado");//resourceBundle.getString("categories"));
-      
-        estado.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
-        content.add(estado);
+        agenteRetencion = new SiNoRadioButtonGroup();
+        agenteRetencion.addValueChangeListener();
+        
+        tipoCotizacion.setLabel("Tipo de cotización");
+        tipoCotizacion.setItems(TipoCotizacionEnum.values());
+
+        radioButtonsLayout.add(tipoProveedor, estado, agenteRetencion, tipoCotizacion);
+        
+        content.add(radioButtonsLayout);
         
 
         final HorizontalLayout barAndGridLayout = new HorizontalLayout();
@@ -139,7 +162,9 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         save.addClickListener(event -> {
             if (entidad != null
                     && binder.writeBeanIfValid(entidad)) {
-                viewLogic.saveProduct(entidad);
+            	entidad.setActivo(estado.getResultado().compareTo(EstadoEntidadEnum.Activo)==0 ? true : false);
+            	entidad.setAgenteRetencion(agenteRetencion.getSelected());
+            	viewLogic.saveProveedor(entidad);
             }
         });
 
@@ -173,15 +198,20 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 
     public void editProveedor() {
         if (entidad == null) {
-            entidad = new Proveedor();
+            entidad = Proveedor.builder()
+            					.activo(false)
+            					.agenteRetencion(false)
+            					.build();
+            
         }
 //        delete.setVisible(!proveedor.isNewProduct());
         binder.bindInstanceFields(this);
         binder.readBean(entidad);
         condicionIva.setValue(entidad.getCondicionIva());
         tipoProveedor.setValue(entidad.getTipoProveedor());
-        estado.setItems(Boolean.TRUE, Boolean.FALSE);
-        estado.setValue(entidad.isActivo());
+        tipoCotizacion.setValue(entidad.getTipoCotizacion());
+        estado.setValue(entidad.isActivo() ? EstadoEntidadEnum.Activo : EstadoEntidadEnum.Inactivo);
+        agenteRetencion.setSelected(entidad.isAgenteRetencion() ? SiNoEnum.Si : SiNoEnum.No);
         domicilios.setItems(entidad.getProveedorDomicilio());
     }
 
@@ -194,7 +224,7 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
     }
 
 
-    public void updateProduct(Proveedor proveedor) {
+    public void updateProveedor(Proveedor proveedor) {
         service.save(proveedor);
     }
 
@@ -202,14 +232,16 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         service.delete(proveedor);
     }
     
-    public void showNotification(String msg) {
-        Notification.show(msg);
-    }
-
+//    public void showNotification(String msg) {
+//        Notification.show(msg);
+//    }
+//
 	@Override
 	public void setParameter(BeforeEvent event, Integer parameter) {
 		// TODO Auto-generated method stub
-		entidad = findProveedor(parameter);
+		if(parameter > 0) {
+			entidad = findProveedor(parameter);
+		}
 		editProveedor();
 	}
 

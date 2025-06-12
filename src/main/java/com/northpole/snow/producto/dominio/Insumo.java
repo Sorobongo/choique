@@ -14,7 +14,7 @@ import java.util.Set;
 import com.northpole.snow.StartupConfig;
 import com.northpole.snow.base.domain.Moneda;
 import com.northpole.snow.base.domain.NombreDescripcionEntity;
-import com.northpole.snow.base.domain.TipoCotizacion;
+import com.northpole.snow.base.enumerados.TipoCotizacionEnum;
 import com.northpole.snow.proveedor.dominio.Proveedor;
 
 import jakarta.persistence.Column;
@@ -83,7 +83,7 @@ public class Insumo  extends NombreDescripcionEntity implements Serializable{
 
 	@Builder.Default
 	@Column(name ="tipo_cotizacion_id")
-	private TipoCotizacion tipoCotizacion = TipoCotizacion.PESOS;
+	private TipoCotizacionEnum tipoCotizacion = TipoCotizacionEnum.PESOS;
 
 	private boolean activo;
 
@@ -154,7 +154,7 @@ public class Insumo  extends NombreDescripcionEntity implements Serializable{
 		if(this.isCaracterSemielaborado()) {
 			this.getInsumos().stream().forEach(si->{
 				Insumo item = si.getInsumo();
-				TipoCotizacion tipoCotizacion = item.getTipoCotizacion();
+				TipoCotizacionEnum tipoCotizacion = item.getTipoCotizacion();
 				costo[0] = costo[0].add( item.getPrecio().multiply(item.getMoneda().getCotizacionActual(tipoCotizacion).multiply(si.getCantidad())));
 
 			});
@@ -181,7 +181,7 @@ public class Insumo  extends NombreDescripcionEntity implements Serializable{
 			});
 			this.setPrecio(costo[0]);
 		}else {
-			TipoCotizacion tipoCotizacion = this.getProveedor().getTipoCotizacion();
+			TipoCotizacionEnum tipoCotizacion = this.getProveedor().getTipoCotizacion();
 			costo[0] = this.getPrecio().multiply(this.getMoneda().getCotizacionActual(tipoCotizacion));
 		}
 		return costo[0];

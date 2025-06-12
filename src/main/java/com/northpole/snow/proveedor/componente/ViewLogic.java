@@ -3,9 +3,14 @@ package com.northpole.snow.proveedor.componente;
 import java.io.Serializable;
 import java.util.ResourceBundle;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.northpole.snow.autenticacion.AccessControl;
 import com.northpole.snow.autenticacion.AccessControlFactory;
+import com.northpole.snow.base.ui.component.IEntityForm;
 import com.northpole.snow.proveedor.dominio.Proveedor;
+import com.northpole.snow.proveedor.service.impl.ProveedorService;
 import com.northpole.snow.proveedor.ui.view.ProveedorListView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
@@ -21,11 +26,11 @@ import com.vaadin.flow.component.notification.Notification;
  * data.
  */
 
-public class ProveedorViewLogic implements Serializable {
+public class ViewLogic implements Serializable {
 
     private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
-    private final ProveedorForm view;
-    public ProveedorViewLogic(ProveedorForm simpleCrudView){//ProveedorListView simpleCrudView) {
+    private final IEntityForm view;
+    public ViewLogic(IEntityForm simpleCrudView){//ProveedorListView simpleCrudView) {
         view = simpleCrudView;
     }
 
@@ -81,7 +86,7 @@ public class ProveedorViewLogic implements Serializable {
                 // login
                 try {
                     final int pid = Integer.parseInt(productId);
-                     view.findProveedor(pid);
+//                     view.findProveedor(pid);
                 } catch (final NumberFormatException e) {
                 }
             }
@@ -94,16 +99,16 @@ public class ProveedorViewLogic implements Serializable {
 //    	return service.findById(proveedorId);
 //    }
 
-    public void saveProveedor(Proveedor proveedor) {
-        final boolean nuevaEntidad = proveedor.esNuevaEntidad();
-        view.updateProveedor(proveedor);
+    public void saveProduct(Proveedor proveedor) {
+        final boolean newProduct = proveedor.esNuevaEntidad();
+//        view.updateProduct(proveedor);
         setFragmentParameter("");
         view.showNotification(proveedor.getRazonSocial()
-                + (nuevaEntidad ? " " + resourceBundle.getString("created") : " " + resourceBundle.getString("updated")));
+                + (newProduct ? " " + resourceBundle.getString("created") : " " + resourceBundle.getString("updated")));
     }
 
     public void deleteProduct(Proveedor proveedor) {
-        view.removeProduct(proveedor);
+//        view.removeProduct(proveedor);
         setFragmentParameter("");
         view.showNotification(proveedor.getRazonSocial() + " " + resourceBundle.getString("removed"));
     }
