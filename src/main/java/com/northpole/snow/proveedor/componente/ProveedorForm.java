@@ -162,7 +162,7 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         save.addClickListener(event -> {
             if (entidad != null
                     && binder.writeBeanIfValid(entidad)) {
-            	entidad.setActivo(estado.getResultado().compareTo(EstadoEntidadEnum.Activo)==0 ? true : false);
+            	entidad.setActivo(estado.getSelected());
             	entidad.setAgenteRetencion(agenteRetencion.getSelected());
             	viewLogic.saveProveedor(entidad);
             }
@@ -210,7 +210,7 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         condicionIva.setValue(entidad.getCondicionIva());
         tipoProveedor.setValue(entidad.getTipoProveedor());
         tipoCotizacion.setValue(entidad.getTipoCotizacion());
-        estado.setValue(entidad.isActivo() ? EstadoEntidadEnum.Activo : EstadoEntidadEnum.Inactivo);
+        estado.setSelected(entidad.isActivo() ? EstadoEntidadEnum.Activo : EstadoEntidadEnum.Inactivo);
         agenteRetencion.setSelected(entidad.isAgenteRetencion() ? SiNoEnum.Si : SiNoEnum.No);
         domicilios.setItems(entidad.getProveedorDomicilio());
     }

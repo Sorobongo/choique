@@ -18,9 +18,7 @@ import lombok.Setter;
 public class EstadoRadioButtonGroup extends HorizontalLayout implements Serializable{
 	
     private final RadioButtonGroup<EstadoEntidadEnum> estado;
-    @Getter
-    @Setter
-    private EstadoEntidadEnum resultado;
+    private Boolean selected;
     
     public EstadoRadioButtonGroup (){
     	estado = new RadioButtonGroup<>();
@@ -32,10 +30,14 @@ public class EstadoRadioButtonGroup extends HorizontalLayout implements Serializ
     }
 
      public void addValueChangeListener() {
-    	estado.addValueChangeListener(e-> resultado = e.getValue());
+    	estado.addValueChangeListener(e-> selected = e.getValue().compareTo(EstadoEntidadEnum.Activo)==0 ? true : false);
     }
 
-     public void setValue(EstadoEntidadEnum valor) {
+     public void setSelected(EstadoEntidadEnum valor) {
     	 estado.setValue(valor);
+     }
+     
+     public Boolean getSelected() {
+    	 return selected;
      }
 }
