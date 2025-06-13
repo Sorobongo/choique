@@ -41,8 +41,7 @@ public class ProveedorViewLogic implements Serializable {
 //    }
 
     public void cancelProduct() {
-        setFragmentParameter("");
-//        view.clearSelection();
+        view.clear();
     }
 
     /**
@@ -96,7 +95,7 @@ public class ProveedorViewLogic implements Serializable {
 
     public void saveProveedor(Proveedor proveedor) {
         final boolean nuevaEntidad = proveedor.esNuevaEntidad();
-        view.updateProveedor(proveedor);
+        view.update(proveedor);
         setFragmentParameter("");
         view.showNotification(proveedor.getRazonSocial()
                 + (nuevaEntidad ? " " + resourceBundle.getString("created") : " " + resourceBundle.getString("updated")));

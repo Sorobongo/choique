@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.northpole.snow.autenticacion.AccessControl;
 import com.northpole.snow.autenticacion.AccessControlFactory;
+import com.northpole.snow.base.domain.BaseEntity;
 import com.northpole.snow.base.domain.CondicionIva;
 import com.northpole.snow.base.domain.TipoProveedor;
 import com.northpole.snow.base.service.ICommonService;
@@ -44,13 +45,12 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 
 @PermitAll
-public class EntityForm<T> extends Div {
+public abstract class EntityForm<T extends BaseEntity> extends Div {
 
     private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
     
-    private final VerticalLayout content;
+    protected final VerticalLayout content;
     
-    protected Button newButton;
     protected Button save;
     protected Button discard;
     protected Button cancel;
@@ -67,13 +67,14 @@ public class EntityForm<T> extends Div {
         save = new Button("Guardar");//resourceBundle.getString("save"));
         save.setWidth("10%");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-//        save.addClickListener(event -> {
-//            if (entidad != null
-//                    && binder.writeBeanIfValid(entidad)) {
-//  //          	this.save(entidad);
-//            }
-//        });
         save.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
+
+        save.addClickListener(event -> {
+            if (entidad != null
+                    && binder.writeBeanIfValid(entidad)) {
+            	this.update(entidad);
+            }
+        });
 
         discard = new Button("descartar");//resourceBundle.getString("discard"));
         discard.setWidth("10%");
@@ -83,7 +84,7 @@ public class EntityForm<T> extends Div {
 
         cancel = new Button("Cancelar");//resourceBundle.getString("cancel"));
         cancel.setWidth("10%");
-//        cancel.addClickListener(event -> viewLogic.cancelProduct());
+        cancel.addClickListener(event -> cancel());
         cancel.addClickShortcut(Key.ESCAPE);
 //        getElement()
 //                .addEventListener("keydown", event -> viewLogic.cancelProduct())
@@ -93,20 +94,12 @@ public class EntityForm<T> extends Div {
         delete.setWidth("10%");
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR,
                 ButtonVariant.LUMO_PRIMARY);
-        newButton = new Button(resourceBundle.getString("new_product"));
-        // Setting theme variant of new production button to LUMO_PRIMARY that
-        // changes its background color to blue and its text color to white
-        newButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        newButton.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        newButton.addClickListener(click -> System.out.println(""));
-        // A shortcut to click the new product button by pressing ALT + N
-        newButton.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
-//        delete.addClickListener(event -> {
-//            if (proveedor != null) {
-//                viewLogic.deleteProduct(proveedor);
-//            }
-//        });
+        delete.addClickListener(event -> {
+            if (entidad != null) {
+                remove(entidad);
+            }
+        });
         HorizontalLayout buttonsLayout = new HorizontalLayout();
         buttonsLayout.add(save, discard, delete, cancel);
         content.add(buttonsLayout);
@@ -116,7 +109,7 @@ public class EntityForm<T> extends Div {
     public void init() {
         if (!AccessControlFactory.getInstance().createAccessControl()
                 .isUserInRole(AccessControl.ADMIN_ROLE_NAME)) {
-            newButton.setEnabled(false);;
+//            newButton.setEnabled(false);;
         }
     }
 
@@ -131,4 +124,11 @@ public class EntityForm<T> extends Div {
         Notification.show(msg);
     }
 
+    protected abstract void update(T entidad);
+
+    protected abstract void remove(T entidad);
+
+    protected abstract void clear();
+    
+    protected abstract void cancel();
 }

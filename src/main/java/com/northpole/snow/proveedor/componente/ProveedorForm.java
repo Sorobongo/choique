@@ -1,5 +1,6 @@
 package com.northpole.snow.proveedor.componente;
 
+import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,20 +57,20 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 
     private ITipoProveedorService tipoProveedorSvc;
     
-    private final VerticalLayout content;
+//    private final VerticalLayout content;
     
 //    private Proveedor proveedor;
     private TextField razonSocial;
     private TextField nombreFantasia;
     private TextField cuit;
     private TextField url;
-    private ComboBox<TipoCotizacionEnum> tipoCotizacion = new ComboBox<>();
+    private ComboBox<TipoCotizacionEnum> cbTipoCotizacion = new ComboBox<>();
     private ComboBox<CondicionIva> condicionIva = new ComboBox<>();
-    private ComboBox<TipoProveedor> tipoProveedor = new ComboBox<>();
+    private ComboBox<TipoProveedor> cbTipoProveedor = new ComboBox<>();
     
 //    private EstadoRadioButtonGroup estado = new EstadoRadioButtonGroup();
-    private EstadoRadioButtonGroup estado;// = new RadioButtonGroup<>();
-    private SiNoRadioButtonGroup agenteRetencion;
+    private EstadoRadioButtonGroup rbEstado;// = new RadioButtonGroup<>();
+    private SiNoRadioButtonGroup rbAgenteRetencion;
     private final ProveedorViewLogic viewLogic  = new ProveedorViewLogic(this);
     private Grid<ProveedorDomicilio> domicilios = new Grid<>(ProveedorDomicilio.class);
     
@@ -78,23 +79,17 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 
         condicionIvaSvc = cis;
         tipoProveedorSvc = tp;
-        content = new VerticalLayout();
-        content.setWidth("100%");
-        content.setSizeUndefined();
-        content.addClassName("proveedor-form-content");
-        add(content);
         
         razonSocial = new TextField("Razon social");//resourceBundle.getString("product_name"));
         razonSocial.setWidth(100, Unit.PERCENTAGE);
         razonSocial.setRequired(true);
         razonSocial.setValueChangeMode(ValueChangeMode.EAGER);
-//        content.add(razonSocial);
         
         nombreFantasia = new TextField("Nombre comercial");//resourceBundle.getString("product_name"));
         nombreFantasia.setWidth("100%");
         nombreFantasia.setRequired(true);
         nombreFantasia.setValueChangeMode(ValueChangeMode.EAGER);
-//        content.add(nombreFantasia);
+
         cuit = new TextField("Cuit");//resourceBundle.getString("cuit"));
         cuit.setWidth("100%");
         cuit.setRequired(true);
@@ -109,6 +104,7 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         url.setValueChangeMode(ValueChangeMode.EAGER);
         
         HorizontalLayout nombre = new HorizontalLayout(razonSocial, nombreFantasia, cuit, condicionIva, url);
+
         content.add(nombre);
 
 //        condicionIva.setItemEnabledProvider(
@@ -116,24 +112,24 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 //                		);
  //        content.add(condicionIva);
 
-        tipoProveedor.setLabel("Tipo proveedor");
-        tipoProveedor.setItemLabelGenerator(TipoProveedor::getNombre);
-        tipoProveedor.setItems(tipoProveedorSvc.findAll());
+        cbTipoProveedor.setLabel("Tipo proveedor");
+        cbTipoProveedor.setItemLabelGenerator(TipoProveedor::getNombre);
+        cbTipoProveedor.setItems(tipoProveedorSvc.findAll());
 //        condicionIva.setItemEnabledProvider(
 //                item -> item.isSelected()
 //                		);
         final HorizontalLayout radioButtonsLayout = new HorizontalLayout();
  
-        estado = new EstadoRadioButtonGroup();
-        estado.addValueChangeListener();
+        rbEstado = new EstadoRadioButtonGroup();
+        rbEstado.addValueChangeListener();
 
-        agenteRetencion = new SiNoRadioButtonGroup();
-        agenteRetencion.addValueChangeListener();
+        rbAgenteRetencion = new SiNoRadioButtonGroup();
+        rbAgenteRetencion.addValueChangeListener();
         
-        tipoCotizacion.setLabel("Tipo de cotización");
-        tipoCotizacion.setItems(TipoCotizacionEnum.values());
+        cbTipoCotizacion.setLabel("Tipo de cotización");
+        cbTipoCotizacion.setItems(TipoCotizacionEnum.values());
 
-        radioButtonsLayout.add(tipoProveedor, estado, agenteRetencion, tipoCotizacion);
+        radioButtonsLayout.add(cbTipoProveedor, rbEstado, rbAgenteRetencion, cbTipoCotizacion);
         
         content.add(radioButtonsLayout);
         
@@ -162,8 +158,6 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         save.addClickListener(event -> {
             if (entidad != null
                     && binder.writeBeanIfValid(entidad)) {
-            	entidad.setActivo(estado.getSelected());
-            	entidad.setAgenteRetencion(agenteRetencion.getSelected());
             	viewLogic.saveProveedor(entidad);
             }
         });
@@ -178,9 +172,9 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 //                .addEventListener("keydown", event -> viewLogic.cancelProduct())
 //                .setFilter("event.key == 'Escape'");
 
-        newButton.addClickListener(click -> viewLogic.newProduct());
+//        newButton.addClickListener(click -> viewLogic.newProduct());
         // A shortcut to click the new product button by pressing ALT + N
-        newButton.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+//        newButton.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
 //        delete.addClickListener(event -> {
 //            if (proveedor != null) {
@@ -201,6 +195,7 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
             entidad = Proveedor.builder()
             					.activo(false)
             					.agenteRetencion(false)
+            					.fechaAlta(LocalDateTime.now())
             					.build();
             
         }
@@ -208,10 +203,10 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         binder.bindInstanceFields(this);
         binder.readBean(entidad);
         condicionIva.setValue(entidad.getCondicionIva());
-        tipoProveedor.setValue(entidad.getTipoProveedor());
-        tipoCotizacion.setValue(entidad.getTipoCotizacion());
-        estado.setSelected(entidad.isActivo() ? EstadoEntidadEnum.Activo : EstadoEntidadEnum.Inactivo);
-        agenteRetencion.setSelected(entidad.isAgenteRetencion() ? SiNoEnum.Si : SiNoEnum.No);
+        cbTipoProveedor.setValue(entidad.getTipoProveedor());
+        cbTipoCotizacion.setValue(entidad.getTipoCotizacion());
+        rbEstado.setSelected(entidad.isActivo() ? EstadoEntidadEnum.Activo : EstadoEntidadEnum.Inactivo);
+        rbAgenteRetencion.setSelected(entidad.isAgenteRetencion() ? SiNoEnum.Si : SiNoEnum.No);
         domicilios.setItems(entidad.getProveedorDomicilio());
     }
 
@@ -224,9 +219,9 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
     }
 
 
-    public void updateProveedor(Proveedor proveedor) {
-        service.save(proveedor);
-    }
+//    public void updateProveedor(Proveedor proveedor) {
+//        service.save(proveedor);
+//    }
 
     public void removeProduct(Proveedor proveedor) {
         service.delete(proveedor);
@@ -245,4 +240,26 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 		editProveedor();
 	}
 
+	protected void update(Proveedor entidad) {
+    	entidad.setActivo(rbEstado.getSelected());
+    	entidad.setAgenteRetencion(rbAgenteRetencion.getSelected());
+		service.save(entidad);
+	}
+
+	protected void remove(Proveedor entidad) {
+		service.delete(entidad);
+	}
+
+	@Override
+	protected void clear() {
+		// TODO Auto-generated method stub
+		binder.getFields().forEach(f -> f.clear());	
+	}
+
+	@Override
+	protected void cancel() {
+		// TODO Auto-generated method stub
+		binder.getFields().forEach(f -> f.clear());	
+		
+	}
 }
