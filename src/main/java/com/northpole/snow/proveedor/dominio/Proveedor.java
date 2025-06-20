@@ -11,6 +11,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -35,6 +38,13 @@ import com.northpole.snow.compra.dominio.FacturaCompraPendienteEntrega;
 import com.northpole.snow.ordenproduccion.dominio.OrdenProduccion;
 import com.northpole.snow.producto.dominio.Insumo;
 import com.northpole.snow.venta.dominio.Factura;
+
+//@NamedEntityGraph(
+//		  name = "proveedor-entity-graph",
+//		  attributeNodes = {
+//		    @NamedAttributeNode("proveedorDomicilio")
+//		  }
+//		)
 
 @Builder
 @NoArgsConstructor

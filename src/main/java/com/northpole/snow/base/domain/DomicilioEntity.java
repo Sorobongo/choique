@@ -2,6 +2,9 @@ package com.northpole.snow.base.domain;
 
 
 
+import java.beans.Transient;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
@@ -19,7 +22,7 @@ import lombok.Setter;
 @Setter
 //@Entity
 //@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "tipo_domicilio")
+//@DiscriminatorColumn(name = "tipo_domicilio")
 //@Table(name = "domicilio")
 @MappedSuperclass
 public class DomicilioEntity extends BaseEntity {
@@ -29,13 +32,5 @@ public class DomicilioEntity extends BaseEntity {
 	private Integer piso;
 	private String departamento;
 	private String pais;
-
-//	@OneToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "codigo_postal_id")
-//	private CodigoPostal codigoPostal;
-//
-//	@OneToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "tipo_domicilio_id")
-//	private TipoDomicilio tipoDomicilio;
 
 }

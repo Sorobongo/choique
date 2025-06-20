@@ -1,6 +1,7 @@
-package com.northpole.snow.proveedor.componente;
+package com.northpole.snow.proveedor.ui.view;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,21 +23,19 @@ import com.northpole.snow.proveedor.service.impl.CondicionIvaService;
 import com.northpole.snow.proveedor.service.impl.ProveedorService;
 import com.northpole.snow.proveedor.service.impl.TipoProveedorService;
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.DataKeyMapper;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
@@ -54,12 +53,8 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
     private ProveedorService service;
     
     private ICondicionIvaService condicionIvaSvc;
-
     private ITipoProveedorService tipoProveedorSvc;
     
-//    private final VerticalLayout content;
-    
-//    private Proveedor proveedor;
     private TextField razonSocial;
     private TextField nombreFantasia;
     private TextField cuit;
@@ -68,17 +63,16 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
     private ComboBox<CondicionIva> condicionIva = new ComboBox<>();
     private ComboBox<TipoProveedor> cbTipoProveedor = new ComboBox<>();
     
-//    private EstadoRadioButtonGroup estado = new EstadoRadioButtonGroup();
     private EstadoRadioButtonGroup rbEstado;// = new RadioButtonGroup<>();
     private SiNoRadioButtonGroup rbAgenteRetencion;
-    private final ProveedorViewLogic viewLogic  = new ProveedorViewLogic(this);
-    private Grid<ProveedorDomicilio> domicilios = new Grid<>(ProveedorDomicilio.class);
+//    private final ProveedorViewLogic viewLogic  = new ProveedorViewLogic(this);
+    private Grid<ProveedorDomicilio> domicilios = new Grid<>();
     
-    public ProveedorForm(CondicionIvaService cis, TipoProveedorService tp) {
+    public ProveedorForm(CondicionIvaService condicionIvaSvc, TipoProveedorService tipoProveedorSvc) {
     	setClassName("proveedor-form");
 
-        condicionIvaSvc = cis;
-        tipoProveedorSvc = tp;
+        this.condicionIvaSvc = condicionIvaSvc;
+        this.tipoProveedorSvc = tipoProveedorSvc;
         
         razonSocial = new TextField("Razon social");//resourceBundle.getString("product_name"));
         razonSocial.setWidth(100, Unit.PERCENTAGE);
@@ -115,9 +109,7 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         cbTipoProveedor.setLabel("Tipo proveedor");
         cbTipoProveedor.setItemLabelGenerator(TipoProveedor::getNombre);
         cbTipoProveedor.setItems(tipoProveedorSvc.findAll());
-//        condicionIva.setItemEnabledProvider(
-//                item -> item.isSelected()
-//                		);
+
         final HorizontalLayout radioButtonsLayout = new HorizontalLayout();
  
         rbEstado = new EstadoRadioButtonGroup();
@@ -129,25 +121,25 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         cbTipoCotizacion.setLabel("Tipo de cotización");
         cbTipoCotizacion.setItems(TipoCotizacionEnum.values());
 
-        radioButtonsLayout.add(cbTipoProveedor, rbEstado, rbAgenteRetencion, cbTipoCotizacion);
+        radioButtonsLayout.add(cbTipoProveedor, cbTipoCotizacion, rbEstado, rbAgenteRetencion );
         
         content.add(radioButtonsLayout);
         
 
-        final HorizontalLayout barAndGridLayout = new HorizontalLayout();
-//        barAndGridLayout.add(topLayout);
-        domicilios.setAllRowsVisible(true);
-        barAndGridLayout.add(domicilios);
-        barAndGridLayout.setFlexGrow(1, domicilios);
-//        barAndGridLayout.setFlexGrow(0, topLayout);
-        barAndGridLayout.setSizeFull();
-        barAndGridLayout.expand(domicilios);
+        final VerticalLayout barAndGridLayout = new VerticalLayout();
+        Button nuevoDomicilio = new Button("Nuevo domicilio");
 
-       
+        nuevoDomicilio.addSingleClickListener(event->this.showNotification(event.getSource().getText()));
+        
+        domicilios.setAllRowsVisible(true);
+        barAndGridLayout.add(nuevoDomicilio, domicilios);
+        barAndGridLayout.setFlexGrow(1, domicilios);
+        barAndGridLayout.setSizeFull();
+//        barAndGridLayout.expand(domicilios, nuevoDomicilio);
+
         content.add(barAndGridLayout);
         
         binder = new BeanValidationBinder<>(Proveedor.class);
-
         binder.addStatusChangeListener(event -> {
             final boolean isValid = !event.hasValidationErrors();
             final boolean hasChanges = binder.hasChanges();
@@ -158,7 +150,7 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         save.addClickListener(event -> {
             if (entidad != null
                     && binder.writeBeanIfValid(entidad)) {
-            	viewLogic.saveProveedor(entidad);
+            	update(entidad);
             }
         });
 
@@ -181,7 +173,6 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 //                viewLogic.deleteProduct(proveedor);
 //            }
 //        });
-        HorizontalLayout buttonsLayout = new HorizontalLayout();
         buttonsLayout.add(save, discard, delete, cancel);
         content.add(buttonsLayout);
     }
@@ -207,16 +198,29 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
         cbTipoCotizacion.setValue(entidad.getTipoCotizacion());
         rbEstado.setSelected(entidad.isActivo() ? EstadoEntidadEnum.Activo : EstadoEntidadEnum.Inactivo);
         rbAgenteRetencion.setSelected(entidad.isAgenteRetencion() ? SiNoEnum.Si : SiNoEnum.No);
+        
+        domicilios.appendFooterRow();
         domicilios.setItems(entidad.getProveedorDomicilio());
+//        domicilios.setItemDetailsRenderer(null); 
+        domicilios.addColumn(ProveedorDomicilio::getId).setKey("domicilioId").setVisible(false);
+        domicilios.addColumn(ProveedorDomicilio::getCalle).setHeader("Calle").setResizable(true);
+        domicilios.addColumn(ProveedorDomicilio::getNumero).setHeader("Altura");
+        domicilios.addColumn(ProveedorDomicilio::getPiso).setHeader("Piso");
+        domicilios.addColumn(ProveedorDomicilio::getDepartamento).setHeader("Oficina");
+        domicilios.addColumn(pd->pd.getCodigoPostal().getLocalidad()).setHeader("Localidad");
+        domicilios.addColumn(pd->pd.getCodigoPostal().getProvincia().getNombre()).setHeader("Provincia");
+        domicilios.addColumn(pd->pd.getTipoDomicilio().getNombre()).setHeader("Tipo domicilio");
+        domicilios.addColumn(ProveedorDomicilio::getPais).setHeader("Pais");
+
     }
 
 //    public void setNewProductEnabled(boolean enabled) {
 //        newButton.setEnabled(enabled);
 //    }
 
-    public Proveedor findProveedor(int proveedorId) {
-    	return service.findById(proveedorId);
-    }
+//    public Proveedor findProveedor(int proveedorId) {
+//    	return service.findConDomicilioById(proveedorId);
+//    }
 
 
 //    public void updateProveedor(Proveedor proveedor) {
@@ -235,7 +239,7 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 	public void setParameter(BeforeEvent event, Integer parameter) {
 		// TODO Auto-generated method stub
 		if(parameter > 0) {
-			entidad = findProveedor(parameter);
+			entidad = findById(parameter);
 		}
 		editProveedor();
 	}
@@ -244,10 +248,15 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
     	entidad.setActivo(rbEstado.getSelected());
     	entidad.setAgenteRetencion(rbAgenteRetencion.getSelected());
 		service.save(entidad);
+        final boolean nuevaEntidad = entidad.esNuevaEntidad();
+        showNotification(entidad.getRazonSocial()
+                + (nuevaEntidad ? " " + resourceBundle.getString("created") : " " + resourceBundle.getString("updated")));
 	}
 
 	protected void remove(Proveedor entidad) {
 		service.delete(entidad);
+        showNotification(entidad.getRazonSocial() + " " + resourceBundle.getString("removed"));
+
 	}
 
 	@Override
@@ -261,5 +270,11 @@ public class ProveedorForm extends EntityForm<Proveedor> implements HasUrlParame
 		// TODO Auto-generated method stub
 		binder.getFields().forEach(f -> f.clear());	
 		
+	}
+
+	@Override
+	protected Proveedor findById(Integer id) {
+		// TODO Auto-generated method stub
+		return service.findConDomicilioById(id);
 	}
 }

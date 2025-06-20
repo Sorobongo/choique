@@ -50,7 +50,8 @@ public abstract class EntityForm<T extends BaseEntity> extends Div {
     private transient ResourceBundle resourceBundle = ResourceBundle.getBundle("MockDataWords", UI.getCurrent().getLocale());
     
     protected final VerticalLayout content;
-    
+    protected final HorizontalLayout buttonsLayout = new HorizontalLayout();
+
     protected Button save;
     protected Button discard;
     protected Button cancel;
@@ -100,9 +101,9 @@ public abstract class EntityForm<T extends BaseEntity> extends Div {
                 remove(entidad);
             }
         });
-        HorizontalLayout buttonsLayout = new HorizontalLayout();
-        buttonsLayout.add(save, discard, delete, cancel);
-        content.add(buttonsLayout);
+//        HorizontalLayout buttonsLayout = new HorizontalLayout();
+//        buttonsLayout.add(save, discard, delete, cancel);
+//        content.add(buttonsLayout);
         init();
     }
 
@@ -124,6 +125,8 @@ public abstract class EntityForm<T extends BaseEntity> extends Div {
         Notification.show(msg);
     }
 
+    protected abstract T findById(Integer id);
+    
     protected abstract void update(T entidad);
 
     protected abstract void remove(T entidad);

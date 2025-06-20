@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
 
 import com.northpole.snow.proveedor.dominio.Proveedor;
@@ -32,8 +33,16 @@ public class ProveedorService {
 	    public void delete(Proveedor proveedor) {
 	    	proveedorDao.delete(proveedor);
 	    }
-	    
-	    public Proveedor findById(Integer id) {
-	    	return proveedorDao.findById(id).get();
-	    }
+
+	    public Proveedor findConDomicilioById(Integer id) {
+	        Proveedor proveedor = proveedorDao.findById(id).orElseThrow();
+	        // Esto debería funcionar sin error
+	        proveedor.getProveedorDomicilio().stream().forEach(d->{
+	        	d.getTipoDomicilio().getNombre();
+	        	d.getCodigoPostal().getLocalidad();
+	        	d.getCodigoPostal().getProvincia().getNombre();
+	        });
+//	        proveedor.getProveedorDomicilio().get(0).getTipoDomicilio().getNombre();
+//	        proveedor.getProveedorDomicilio().get(0).getCodigoPostal().getLocalidad();
+	        return proveedor;	    }
 }
